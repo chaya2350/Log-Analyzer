@@ -1,0 +1,8 @@
+2026-08-25T08:10:00 INFO Application started
+2026-08-25T08:15:32 INFO User authenticated
+2026-08-25T09:02:11 WARN Database response slow
+2026-08-25T09:15:44 ERROR Database connection failed
+2026-08-25T09:18:21 ERROR Database connection failed
+2026-08-25T10:05:10 INFO Request completed
+2026-08-25T10:12:55 ERROR Timeout while calling external service
+2026-08-25T11:30:00 WARN Memory usage high
