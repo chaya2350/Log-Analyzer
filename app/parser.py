@@ -11,8 +11,7 @@ PARSERS = {
     "apache": parse_apache,
 }
 
-
-def parse_file(path: str, log_type: str) -> list:
+def get_parser(log_type: str):
     parser = PARSERS.get(log_type.lower())
 
     if parser is None:
@@ -20,13 +19,30 @@ def parse_file(path: str, log_type: str) -> list:
             f"Unsupported log type: {log_type}"
         )
 
+    return parser
+
+def parse_content(content: str, log_type: str) -> list[LogEvent]:
+    parser = get_parser(log_type)
+
     events = []
 
-    with open(path, "r", encoding="utf-8") as file:
-        for line in file:
-            event = parser(line)
+    for line in content.splitlines():
+        event = parser(line)
 
-            if event:
-                events.append(event)
+        if event:
+            events.append(event)
+
+    return events
+
+def parse_content(content: str, log_type: str) -> list[LogEvent]:
+    parser = get_parser(log_type)
+
+    events = []
+
+    for line in content.splitlines():
+        event = parser(line)
+
+        if event:
+            events.append(event)
 
     return events

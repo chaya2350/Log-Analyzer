@@ -1,10 +1,8 @@
 from dataclasses import asdict
 
-from fastapi import FastAPI, HTTPException, Query
-
-from .parser import parse_file
+from fastapi import (FastAPI, File, Form, HTTPException, UploadFile, Query)
+from .parser import parse_file, parse_content
 from .analyzer import analyze, search_events
-
 
 app = FastAPI(title="Log Analyzer")
 
@@ -66,6 +64,41 @@ def get_event(index: int):
         )
 
     return asdict(events[index])
+
+
+@app.post("/upload")
+async def upload_log(
+    file: UploadFile = File(...),
+    log_type: str = Query(
+        default="application",
+        pattern="^(application|json|apache)$",
+    ),
+):
+    content = await file.read()
+
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(
+            status_code=400,
+            detail="File must be UTF-8 encoded",
+        )
+
+    try:
+        events = parse_content(text, log_type)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error),
+        )
+
+    result = analyze(events)
+
+    return {
+        "filename": file.filename,
+        "log_type": log_type,
+        **result,
+    }
 
 
 @app.get("/")
