@@ -4,6 +4,7 @@ from .log_parsers import (
     parse_apache,
 )
 
+from .models import LogEvent
 
 PARSERS = {
     "application": parse_application,
@@ -34,15 +35,19 @@ def parse_content(content: str, log_type: str) -> list[LogEvent]:
 
     return events
 
-def parse_content(content: str, log_type: str) -> list[LogEvent]:
+def parse_file(
+    path: str,
+    log_type: str,
+) -> list[LogEvent]:
     parser = get_parser(log_type)
 
     events = []
 
-    for line in content.splitlines():
-        event = parser(line)
+    with open(path, "r", encoding="utf-8") as file:
+        for line in file:
+            event = parser(line)
 
-        if event:
-            events.append(event)
+            if event:
+                events.append(event)
 
     return events
